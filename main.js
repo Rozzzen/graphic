@@ -52,7 +52,6 @@ function Model(name) {
 
 // Constructor
 function ShaderProgram(name, program) {
-    function ShaderProgram(name, program) {
         this.name = name;
         this.prog = program;
         // Location of the attribute variable in the shader program.
@@ -93,7 +92,6 @@ function ShaderProgram(name, program) {
             gl.useProgram(this.prog);
             gl.useProgram(this.prog);
         };
-    }
 }
 
 
