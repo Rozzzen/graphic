@@ -90,14 +90,11 @@ function ShaderProgram(name, program) {
         this.iTextureAngle = -1;
         this.iTexturePoint = -1;
         this.Use = function () {
-            this.Use = function () {
-                gl.useProgram(this.prog);
-                gl.useProgram(this.prog);
-            };
+            gl.useProgram(this.prog);
+            gl.useProgram(this.prog);
         };
     }
 }
-
 
 
 /* Draws a colored cube, along with a set of coordinate axes.
