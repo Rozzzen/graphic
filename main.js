@@ -117,29 +117,24 @@ function draw() {
 }
 
 function CreateSurfaceData() {
-    function CreateSurfaceData()
-    {
-        let vertexList = [];
+    let vertexList = [];
 
-        const POINTS = 100;
+    const POINTS = 100;
 
-        for (let i = 0; i <= POINTS; i++) {
+    for (let i = 0; i <= POINTS; i++) {
 
-            const u = i * 2 * Math.PI / POINTS;
+        const u = i * 2 * Math.PI / POINTS;
 
-            for (let j = 0; j < POINTS; j++) {
+        for (let j = 0; j < POINTS; j++) {
 
-                const v = j * 2 * Math.PI / POINTS;
+            const v = j * 2 * Math.PI / POINTS;
 
-                const x = Math.pow(Math.cos(u) * Math.cos(v), 3);
-                const y = Math.pow(Math.sin(u) * Math.cos(v), 3);
-                const z = Math.pow(Math.sin(v), 3);
+            const x = Math.pow(Math.cos(u) * Math.cos(v), 3);
+            const y = Math.pow(Math.sin(u) * Math.cos(v), 3);
+            const z = Math.pow(Math.sin(v), 3);
 
-                vertexList.push(x, y, z);
-            }
+            vertexList.push(x, y, z);
         }
-
-        return vertexList;
     }
 
     return vertexList;
