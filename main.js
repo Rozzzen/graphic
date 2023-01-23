@@ -7,7 +7,7 @@ let spaceball;                  // A SimpleRotator object that lets the user rot
 
 let handlePosition = 0.0;
 
-const texturePoint = { x: 100, y: 800 };
+const texturePoint = {x: 100, y: 800};
 
 let a = 6;
 let b = 20;
@@ -52,33 +52,52 @@ function Model(name) {
 
 // Constructor
 function ShaderProgram(name, program) {
-
-    this.name = name;
-    this.prog = program;
-
-    // Location of the attribute variable in the shader program.
-    this.iAttribVertex = -1;
-    // Location of the uniform specifying a color for the primitive.
-    this.iColor = -1;
-    // Location of the uniform matrix representing the combined transformation.
-    this.iModelViewProjectionMatrix = -1;
-
-    this.iNormal = -1;
-    this.iNormalMatrix = -1;
-
-    this.iAmbientColor = -1;
-    this.iDiffuseColor = -1;
-    this.iSpecularColor = -1;
-
-    this.iShininess = -1;
-
-    this.iLightPosition = -1;
-    this.iLightVec = -1;
-
-    this.Use = function () {
-        gl.useProgram(this.prog);
-    };
+    function ShaderProgram(name, program) {
+        this.name = name;
+        this.prog = program;
+        // Location of the attribute variable in the shader program.
+        this.name = name;
+        this.iAttribVertex = -1;
+        // Location of the uniform specifying a color for the primitive.
+        this.prog = program;
+        this.iColor = -1;
+        // Location of the uniform matrix representing the combined transformation.
+        this.iModelViewProjectionMatrix = -1;
+        // Location of the attribute variable in the shader program.
+        this.iAttribVertex = -1;
+        // Location of the uniform specifying a color for the primitive.
+        this.iColor = -1;
+        this.iNormal = -1;
+        // Location of the uniform matrix representing the combined transformation.
+        this.iModelViewProjectionMatrix = -1;
+        this.iNormalMatrix = -1;
+        this.iNormal = -1;
+        this.iAmbientColor = -1;
+        this.iNormalMatrix = -1;
+        this.iDiffuseColor = -1;
+        this.iSpecularColor = -1;
+        this.iAmbientColor = -1;
+        this.iShininess = -1;
+        this.iDiffuseColor = -1;
+        this.iSpecularColor = -1;
+        this.iLightPosition = -1;
+        this.iShininess = -1;
+        this.iLightVec = -1;
+        this.iLightPosition = -1;
+        this.iTextureCoords = -1;
+        this.iLightVec = -1;
+        this.iTextureU = -1;
+        this.iTextureAngle = -1;
+        this.iTexturePoint = -1;
+        this.Use = function () {
+            this.Use = function () {
+                gl.useProgram(this.prog);
+                gl.useProgram(this.prog);
+            };
+        };
+    }
 }
+
 
 
 /* Draws a colored cube, along with a set of coordinate axes.
@@ -166,11 +185,11 @@ function CreateSurfaceData() {
 
     const POINTS = 100;
 
-    for (let u = 0; u <= POINTS; u+=stepU) {
+    for (let u = 0; u <= POINTS; u += stepU) {
 
         const U = u * 2 * Math.PI / POINTS;
 
-        for (let v = 0; v < POINTS; v+=stepV) {
+        for (let v = 0; v < POINTS; v += stepV) {
 
             const V = v * 2 * Math.PI / POINTS;
 
@@ -182,7 +201,7 @@ function CreateSurfaceData() {
             textureList.push(getU(u), getV(v));
 
             const x1 = Math.pow(Math.cos(U + stepU) * Math.cos(U + stepU), 3);
-            const y1 = Math.pow(Math.sin(U+ stepU) * Math.cos(V + stepV), 3);
+            const y1 = Math.pow(Math.sin(U + stepU) * Math.cos(V + stepV), 3);
             const z1 = Math.pow(Math.sin(V + stepV), 3);
 
             vertexList.push(x1, y1, z1)
@@ -190,7 +209,7 @@ function CreateSurfaceData() {
         }
     }
 
-    return { vertexList, textureList };
+    return {vertexList, textureList};
 }
 
 
@@ -226,7 +245,7 @@ function initGL() {
     shProgram.iTexturePoint = gl.getUniformLocation(prog, "texturePoint");
 
     surface = new Model("Surface");
-    const { vertexList, textureList } = CreateSurfaceData();
+    const {vertexList, textureList} = CreateSurfaceData();
     surface.BufferData(vertexList, textureList);
 
     loadTexture();
@@ -356,7 +375,7 @@ const lightCoordinates = () => {
 
 
 const reDraw = () => {
-    const { vertexList, textureList } = CreateSurfaceData();
+    const {vertexList, textureList} = CreateSurfaceData();
     surface.BufferData(vertexList, textureList);
     draw();
 };
