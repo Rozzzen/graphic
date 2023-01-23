@@ -7,6 +7,8 @@ let spaceball;                  // A SimpleRotator object that lets the user rot
 
 let handlePosition = 0.0;
 
+const texturePoint = { x: 100, y: 800 };
+
 let a = 6;
 let b = 20;
 
@@ -19,11 +21,19 @@ function deg2rad(angle) {
 function Model(name) {
     this.name = name;
     this.iVertexBuffer = gl.createBuffer();
+    this.iTextureBuffer = gl.createBuffer();
     this.count = 0;
 
-    this.BufferData = function (vertices) {
+    this.BufferData = function (vertices, textures) {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.iVertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STREAM_DRAW);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.iTextureBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures), gl.STREAM_DRAW);
+
+        gl.enableVertexAttribArray(shProgram.iTextureCoords);
+        gl.vertexAttribPointer(shProgram.iTextureCoords, 2, gl.FLOAT, false, 0, 0);
+
         this.count = vertices.length / 3;
     };
 
@@ -97,14 +107,16 @@ function draw() {
        combined transformation matrix, and send that to the shader program. */
     let modelViewProjection = m4.multiply(projection, matAccum1);
 
-    gl.uniformMatrix4fv(shProgram.iModelViewProjectionMatrix, false, modelViewProjection);
+    gl.uniformMatrix4fv(
+        shProgram.iModelViewProjectionMatrix,
+        false,
+        modelViewProjection
+    );
     gl.uniformMatrix4fv(shProgram.iNormalMatrix, false, normalMatrix);
 
     gl.uniform3fv(shProgram.iLightPosition, lightCoordinates());
     gl.uniform3fv(shProgram.iLightDirection, [1, 0, 0]);
-
     gl.uniform3fv(shProgram.iLightVec, new Float32Array(3));
-
     gl.uniform1f(shProgram.iShininess, 1.0);
 
     gl.uniform3fv(shProgram.iAmbientColor, [0.5, 0, 0.4]);
@@ -113,27 +125,68 @@ function draw() {
     /* Draw the six faces of a cube, with different colors. */
     gl.uniform4fv(shProgram.iColor, [1, 1, 0, 1]);
 
+    const angle = document.getElementById("rAngle").value;
+    gl.uniform1f(shProgram.iTextureAngle, deg2rad(+angle));
+
+    const u = deg2rad(texturePoint.x);
+    const v = deg2rad(texturePoint.y);
+
+    gl.uniform2fv(shProgram.iTexturePoint, [
+        a * (b - Math.cos(u)) * Math.sin(u) * Math.cos(v),
+        a * (b - Math.cos(u)) * Math.sin(u) * Math.sin(v),
+    ]);
+
+    gl.activeTexture(gl.TEXTURE0);
+    gl.uniform1i(shProgram.iTextureU, 0);
+
     surface.Draw();
 }
 
+const step = (max, splines = 20) => {
+    return max / (splines - 1);
+};
+
 function CreateSurfaceData() {
     let vertexList = [];
+    let textureList = [];
+    let splines = 20;
+
+    let maxU = Math.PI;
+    let maxV = 2 * Math.PI;
+    let stepU = step(maxU, splines);
+    let stepV = step(maxV, splines);
+
+    let getU = (u) => {
+        return u / maxU;
+    };
+
+    let getV = (v) => {
+        return v / maxV;
+    };
 
     const POINTS = 100;
 
-    for (let i = 0; i <= POINTS; i++) {
+    for (let u = 0; u <= POINTS; u+=stepU) {
 
-        const u = i * 2 * Math.PI / POINTS;
+        const U = u * 2 * Math.PI / POINTS;
 
-        for (let j = 0; j < POINTS; j++) {
+        for (let v = 0; v < POINTS; v+=stepV) {
 
-            const v = j * 2 * Math.PI / POINTS;
+            const V = v * 2 * Math.PI / POINTS;
 
-            const x = Math.pow(Math.cos(u) * Math.cos(v), 3);
-            const y = Math.pow(Math.sin(u) * Math.cos(v), 3);
-            const z = Math.pow(Math.sin(v), 3);
+            const x = Math.pow(Math.cos(U) * Math.cos(U), 3);
+            const y = Math.pow(Math.sin(U) * Math.cos(V), 3);
+            const z = Math.pow(Math.sin(V), 3);
 
             vertexList.push(x, y, z);
+            textureList.push(getU(u), getV(v));
+
+            const x1 = Math.pow(Math.cos(U + stepU) * Math.cos(U + stepU), 3);
+            const y1 = Math.pow(Math.sin(U+ stepU) * Math.cos(V + stepV), 3);
+            const z1 = Math.pow(Math.sin(V + stepV), 3);
+
+            vertexList.push(x1, y1, z1)
+            textureList.push(getU(u + stepU), getV(v + stepV));
         }
     }
 
@@ -149,7 +202,10 @@ function initGL() {
     shProgram.Use();
 
     shProgram.iAttribVertex = gl.getAttribLocation(prog, "vertex");
-    shProgram.iModelViewProjectionMatrix = gl.getUniformLocation(prog, "ModelViewProjectionMatrix");
+    shProgram.iModelViewProjectionMatrix = gl.getUniformLocation(
+        prog,
+        "ModelViewProjectionMatrix"
+    );
     shProgram.iColor = gl.getUniformLocation(prog, "color");
 
     shProgram.iNormal = gl.getAttribLocation(prog, "normal");
@@ -164,8 +220,16 @@ function initGL() {
     shProgram.iLightPosition = gl.getUniformLocation(prog, "lightPosition");
     shProgram.iLightVec = gl.getUniformLocation(prog, "lightVec");
 
+    shProgram.iTextureCoords = gl.getAttribLocation(prog, "textureCoords");
+    shProgram.iTextureU = gl.getUniformLocation(prog, "textureU");
+    shProgram.iTextureAngle = gl.getUniformLocation(prog, "textureAngle");
+    shProgram.iTexturePoint = gl.getUniformLocation(prog, "texturePoint");
+
     surface = new Model("Surface");
-    surface.BufferData(CreateSurfaceData());
+    const { vertexList, textureList } = CreateSurfaceData();
+    surface.BufferData(vertexList, textureList);
+
+    loadTexture();
 
     gl.enable(gl.DEPTH_TEST);
 }
@@ -231,12 +295,24 @@ function init() {
 }
 
 window.addEventListener("keydown", function (event) {
-    switch (event.key) {
+    switch (event.code) {
         case "ArrowLeft":
             left();
             break;
         case "ArrowRight":
             right();
+            break;
+        case "KeyW":
+            pressW();
+            break;
+        case "KeyS":
+            pressS();
+            break;
+        case "KeyD":
+            pressD();
+            break;
+        case "KeyA":
+            pressA();
             break;
         default:
             return;
@@ -253,12 +329,50 @@ const right = () => {
     reDraw();
 };
 
+const pressW = () => {
+    texturePoint.y += 0.5;
+    reDraw();
+};
+
+const pressS = () => {
+    texturePoint.y -= 0.5;
+    reDraw();
+};
+
+const pressA = () => {
+    texturePoint.x -= 0.5;
+    reDraw();
+};
+
+const pressD = () => {
+    texturePoint.x += 0.5;
+    reDraw();
+};
+
 const lightCoordinates = () => {
     let coord = Math.sin(handlePosition) * 1.2;
     return [coord, -2, coord * coord];
 };
 
+
 const reDraw = () => {
-    surface.BufferData(CreateSurfaceData());
+    const { vertexList, textureList } = CreateSurfaceData();
+    surface.BufferData(vertexList, textureList);
     draw();
+};
+
+const loadTexture = () => {
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.src =
+        "https://www.the3rdsequence.com/texturedb/download/259/texture/jpg/1024/burning+hot+lava-1024x1024.jpg";
+
+    image.addEventListener("load", () => {
+        const texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        draw();
+    });
 };
