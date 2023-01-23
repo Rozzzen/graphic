@@ -33,8 +33,6 @@ function Model(name) {
 
         gl.enableVertexAttribArray(shProgram.iTextureCoords);
         gl.vertexAttribPointer(shProgram.iTextureCoords, 2, gl.FLOAT, false, 0, 0);
-
-        this.count = vertices.length / 3;
     };
 
     this.Draw = function () {
