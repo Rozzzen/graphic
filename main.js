@@ -378,7 +378,7 @@ const loadTexture = () => {
     const image = new Image();
     image.crossOrigin = "anonymous";
     image.src =
-        "https://w0.peakpx.com/wallpaper/1004/276/HD-wallpaper-cracked-ice-texture-winter-texture-frozen-water-texture-ice-texture-blue-water-background-with-cracks-ice-background-ice-cracked-texture.jpg";
+        "https://www.the3rdsequence.com/texturedb/download/259/texture/jpg/1024/burning+hot+lava-1024x1024.jpg";
 
     image.addEventListener("load", () => {
         const texture = gl.createTexture();
