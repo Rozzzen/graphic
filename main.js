@@ -154,51 +154,37 @@ function CreateSurfaceData() {
     let vertexList = [];
     let textureList = [];
     let splines = 20;
-
     let maxU = Math.PI;
     let maxV = 2 * Math.PI;
     let stepU = step(maxU, splines);
     let stepV = step(maxV, splines);
-
     let getU = (u) => {
         return u / maxU;
     };
-
     let getV = (v) => {
         return v / maxV;
     };
-
     const POINTS = 100;
-
-    const a = 2;
-    const b = 2;
-    const c = 4;
-    const d = 6;
-
+    const a = 0.5;
+    const b = 0.5;
+    const c = 0.5;
+    const d = 1;
     for (let u = 0; u <= POINTS; u += stepU) {
-
         const U = u * 2 * Math.PI / POINTS;
-
         for (let v = 0; v < POINTS; v += stepV) {
-
             const V = v * 2 * Math.PI / POINTS;
-
             const x = (a + c * Math.pow(Math.cos(V), 3) * Math.cos(Math.PI) + d * Math.pow(Math.sin(V), 3) * Math.sin(Math.PI)) * Math.cos(U);
             const y = (a + c * Math.pow(Math.cos(V), 3) * Math.cos(Math.PI) + d * Math.pow(Math.sin(V), 3) * Math.sin(Math.PI)) * Math.sin(U);
             const z = b * U - c * Math.pow(Math.cos(V), 3) * Math.sin(Math.PI) + d * Math.pow(Math.sin(V), 3) * Math.cos(Math.PI);
-
             vertexList.push(x, y, z);
             textureList.push(getU(u), getV(v));
-
             const x1 = (a + c * Math.pow(Math.cos(V + stepV), 3) * Math.cos(Math.PI) + d * Math.pow(Math.sin(V + stepV), 3) * Math.sin(Math.PI)) * Math.cos(U + stepU);
             const y1 = (a + c * Math.pow(Math.cos(V + stepV), 3) * Math.cos(Math.PI) + d * Math.pow(Math.sin(V + stepV), 3) * Math.sin(Math.PI)) * Math.sin(U + stepU);
             const z1 = b * U - c * Math.pow(Math.cos(V + stepV), 3) * Math.sin(Math.PI) + d * Math.pow(Math.sin(V + stepV), 3) * Math.cos(Math.PI);
-
             vertexList.push(x1, y1, z1)
             textureList.push(getU(u + stepU), getV(v + stepV));
         }
     }
-
     return {vertexList, textureList};
 }
 
