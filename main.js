@@ -52,46 +52,45 @@ function Model(name) {
 
 // Constructor
 function ShaderProgram(name, program) {
-        this.name = name;
-        this.prog = program;
-        // Location of the attribute variable in the shader program.
-        this.name = name;
-        this.iAttribVertex = -1;
-        // Location of the uniform specifying a color for the primitive.
-        this.prog = program;
-        this.iColor = -1;
-        // Location of the uniform matrix representing the combined transformation.
-        this.iModelViewProjectionMatrix = -1;
-        // Location of the attribute variable in the shader program.
-        this.iAttribVertex = -1;
-        // Location of the uniform specifying a color for the primitive.
-        this.iColor = -1;
-        this.iNormal = -1;
-        // Location of the uniform matrix representing the combined transformation.
-        this.iModelViewProjectionMatrix = -1;
-        this.iNormalMatrix = -1;
-        this.iNormal = -1;
-        this.iAmbientColor = -1;
-        this.iNormalMatrix = -1;
-        this.iDiffuseColor = -1;
-        this.iSpecularColor = -1;
-        this.iAmbientColor = -1;
-        this.iShininess = -1;
-        this.iDiffuseColor = -1;
-        this.iSpecularColor = -1;
-        this.iLightPosition = -1;
-        this.iShininess = -1;
-        this.iLightVec = -1;
-        this.iLightPosition = -1;
-        this.iTextureCoords = -1;
-        this.iLightVec = -1;
-        this.iTextureU = -1;
-        this.iTextureAngle = -1;
-        this.iTexturePoint = -1;
-        this.Use = function () {
-            gl.useProgram(this.prog);
-            gl.useProgram(this.prog);
-        };
+    this.name = name;
+    this.prog = program;
+    // Location of the attribute variable in the shader program.
+    this.name = name;
+    this.iAttribVertex = -1;
+    // Location of the uniform specifying a color for the primitive.
+    this.prog = program;
+    this.iColor = -1;
+    // Location of the uniform matrix representing the combined transformation.
+    this.iModelViewProjectionMatrix = -1;
+    // Location of the attribute variable in the shader program.
+    this.iAttribVertex = -1;
+    // Location of the uniform specifying a color for the primitive.
+    this.iColor = -1;
+    this.iNormal = -1;
+    // Location of the uniform matrix representing the combined transformation.
+    this.iModelViewProjectionMatrix = -1;
+    this.iNormalMatrix = -1;
+    this.iNormal = -1;
+    this.iAmbientColor = -1;
+    this.iNormalMatrix = -1;
+    this.iDiffuseColor = -1;
+    this.iSpecularColor = -1;
+    this.iAmbientColor = -1;
+    this.iShininess = -1;
+    this.iDiffuseColor = -1;
+    this.iSpecularColor = -1;
+    this.iLightPosition = -1;
+    this.iShininess = -1;
+    this.iLightVec = -1;
+    this.iLightPosition = -1;
+    this.iTextureCoords = -1;
+    this.iLightVec = -1;
+    this.iTextureU = -1;
+    this.iTextureAngle = -1;
+    this.iTexturePoint = -1;
+    this.Use = function () {
+        gl.useProgram(this.prog);
+    };
 }
 
 
@@ -379,7 +378,7 @@ const loadTexture = () => {
     const image = new Image();
     image.crossOrigin = "anonymous";
     image.src =
-        "https://www.the3rdsequence.com/texturedb/download/259/texture/jpg/1024/burning+hot+lava-1024x1024.jpg";
+        "https://assets.weforum.org/article/image/-kAmkWBv6D5bGHdDdPS8-crf77DaIxQ46eHOVyawZp4.jpg";
 
     image.addEventListener("load", () => {
         const texture = gl.createTexture();
