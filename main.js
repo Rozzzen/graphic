@@ -54,40 +54,31 @@ function Model(name) {
 function ShaderProgram(name, program) {
     this.name = name;
     this.prog = program;
+
     // Location of the attribute variable in the shader program.
-    this.name = name;
     this.iAttribVertex = -1;
     // Location of the uniform specifying a color for the primitive.
-    this.prog = program;
     this.iColor = -1;
     // Location of the uniform matrix representing the combined transformation.
     this.iModelViewProjectionMatrix = -1;
-    // Location of the attribute variable in the shader program.
-    this.iAttribVertex = -1;
-    // Location of the uniform specifying a color for the primitive.
-    this.iColor = -1;
+
     this.iNormal = -1;
-    // Location of the uniform matrix representing the combined transformation.
-    this.iModelViewProjectionMatrix = -1;
     this.iNormalMatrix = -1;
-    this.iNormal = -1;
+
     this.iAmbientColor = -1;
-    this.iNormalMatrix = -1;
     this.iDiffuseColor = -1;
     this.iSpecularColor = -1;
-    this.iAmbientColor = -1;
+
     this.iShininess = -1;
-    this.iDiffuseColor = -1;
-    this.iSpecularColor = -1;
+
     this.iLightPosition = -1;
-    this.iShininess = -1;
     this.iLightVec = -1;
-    this.iLightPosition = -1;
+
     this.iTextureCoords = -1;
-    this.iLightVec = -1;
     this.iTextureU = -1;
     this.iTextureAngle = -1;
     this.iTexturePoint = -1;
+
     this.Use = function () {
         gl.useProgram(this.prog);
     };
@@ -179,6 +170,11 @@ function CreateSurfaceData() {
 
     const POINTS = 100;
 
+    const a = 2;
+    const b = 2;
+    const c = 4;
+    const d = 6;
+
     for (let u = 0; u <= POINTS; u += stepU) {
 
         const U = u * 2 * Math.PI / POINTS;
@@ -187,16 +183,16 @@ function CreateSurfaceData() {
 
             const V = v * 2 * Math.PI / POINTS;
 
-            const x = Math.pow(Math.cos(U) * Math.cos(U), 3);
-            const y = Math.pow(Math.sin(U) * Math.cos(V), 3);
-            const z = Math.pow(Math.sin(V), 3);
+            const x = (a + c * Math.pow(Math.cos(V), 3) * Math.cos(Math.PI) + d * Math.pow(Math.sin(V), 3) * Math.sin(Math.PI)) * Math.cos(U);
+            const y = (a + c * Math.pow(Math.cos(V), 3) * Math.cos(Math.PI) + d * Math.pow(Math.sin(V), 3) * Math.sin(Math.PI)) * Math.sin(U);
+            const z = b * U - c * Math.pow(Math.cos(V), 3) * Math.sin(Math.PI) + d * Math.pow(Math.sin(V), 3) * Math.cos(Math.PI);
 
             vertexList.push(x, y, z);
             textureList.push(getU(u), getV(v));
 
-            const x1 = Math.pow(Math.cos(U + stepU) * Math.cos(U + stepU), 3);
-            const y1 = Math.pow(Math.sin(U + stepU) * Math.cos(V + stepV), 3);
-            const z1 = Math.pow(Math.sin(V + stepV), 3);
+            const x1 = (a + c * Math.pow(Math.cos(V + stepV), 3) * Math.cos(Math.PI) + d * Math.pow(Math.sin(V + stepV), 3) * Math.sin(Math.PI)) * Math.cos(U + stepU);
+            const y1 = (a + c * Math.pow(Math.cos(V + stepV), 3) * Math.cos(Math.PI) + d * Math.pow(Math.sin(V + stepV), 3) * Math.sin(Math.PI)) * Math.sin(U + stepU);
+            const z1 = b * U - c * Math.pow(Math.cos(V + stepV), 3) * Math.sin(Math.PI) + d * Math.pow(Math.sin(V + stepV), 3) * Math.cos(Math.PI);
 
             vertexList.push(x1, y1, z1)
             textureList.push(getU(u + stepU), getV(v + stepV));
