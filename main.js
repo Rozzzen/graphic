@@ -378,7 +378,7 @@ const loadTexture = () => {
     const image = new Image();
     image.crossOrigin = "anonymous";
     image.src =
-        "https://assets.weforum.org/article/image/-kAmkWBv6D5bGHdDdPS8-crf77DaIxQ46eHOVyawZp4.jpg";
+        "https://img.freepik.com/premium-photo/natural-texture-winter-ice-blue-ice-as-background_117930-805.jpg?w=2000";
 
     image.addEventListener("load", () => {
         const texture = gl.createTexture();
