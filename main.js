@@ -378,7 +378,7 @@ const loadTexture = () => {
     const image = new Image();
     image.crossOrigin = "anonymous";
     image.src =
-        "https://img.freepik.com/premium-photo/natural-texture-winter-ice-blue-ice-as-background_117930-805.jpg?w=2000";
+        "https://w0.peakpx.com/wallpaper/1004/276/HD-wallpaper-cracked-ice-texture-winter-texture-frozen-water-texture-ice-texture-blue-water-background-with-cracks-ice-background-ice-cracked-texture.jpg";
 
     image.addEventListener("load", () => {
         const texture = gl.createTexture();
