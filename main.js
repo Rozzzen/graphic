@@ -4,229 +4,298 @@ let gl;                         // The webgl context.
 let surface;                    // A surface model
 let shProgram;                  // A shader program
 let spaceball;                  // A SimpleRotator object that lets the user rotate the view by mouse.
+let InputCounter = 0.0;
+let ScalePointLocationU = 0.0;
+let ScalePointLocationV = 0.0;
+let ControllerScaleValue = 1;
 
-let handlePosition = 0.0;
-
-const texturePoint = {x: 100, y: 800};
-
-let a = 6;
-let b = 20;
+const a = 0;
+const b = 0.5;
+const c = 0.5;
+const phi = 0;
 
 function deg2rad(angle) {
     return angle * Math.PI / 180;
 }
 
-
 // Constructor
 function Model(name) {
     this.name = name;
     this.iVertexBuffer = gl.createBuffer();
+    this.iNormalBuffer = gl.createBuffer();
     this.iTextureBuffer = gl.createBuffer();
+
+    this.iPointVertexBuffer = gl.createBuffer();
+
     this.count = 0;
 
-    this.BufferData = function (vertices, textures) {
+    this.BufferData = function(vertices, normals, texCoords) {
+
         gl.bindBuffer(gl.ARRAY_BUFFER, this.iVertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STREAM_DRAW);
+       
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.iNormalBuffer)
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(normals), gl.STREAM_DRAW);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.iTextureBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textures), gl.STREAM_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.iTextureBuffer)
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoords), gl.STREAM_DRAW);
 
-        gl.enableVertexAttribArray(shProgram.iTextureCoords);
-        gl.vertexAttribPointer(shProgram.iTextureCoords, 2, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.iPointVertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0, 0, 0]), gl.DYNAMIC_DRAW);
 
-        this.count = vertices.length / 3;
-    };
+        this.count = vertices.length/3;
+    }
 
-    this.Draw = function () {
+    this.Draw = function() {
+        gl.uniform1i(shProgram.iDrawPoint, false);
+
         gl.bindBuffer(gl.ARRAY_BUFFER, this.iVertexBuffer);
         gl.vertexAttribPointer(shProgram.iAttribVertex, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(shProgram.iAttribVertex);
 
-        gl.vertexAttribPointer(shProgram.iNormal, 3, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(shProgram.iNormal);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.iNormalBuffer);
+        gl.vertexAttribPointer(shProgram.iNormalVertex, 3, gl.FLOAT, true, 0, 0);
+        gl.enableVertexAttribArray(shProgram.iNormalVertex);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.iTextureBuffer);
+        gl.vertexAttribPointer(shProgram.iTextureCoords, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(shProgram.iTextureCoords);
 
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.count);
-    };
-}
 
+        // Draw point
+
+        gl.uniform1i(shProgram.iDrawPoint, true);
+
+        gl.uniform3fv(shProgram.iScalePointWorldLocation, [CalcX(ScalePointLocationU, ScalePointLocationV), CalcY(ScalePointLocationU, ScalePointLocationV), CalcZ(ScalePointLocationU, ScalePointLocationV)]);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.iVertexBuffer);
+        gl.vertexAttribPointer(shProgram.iAttribVertex, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(shProgram.iAttribVertex);
+     
+        gl.drawArrays(gl.POINTS, 0, 1);
+    }
+}
 
 // Constructor
 function ShaderProgram(name, program) {
+
     this.name = name;
     this.prog = program;
 
-    // Location of the attribute variable in the shader program.
     this.iAttribVertex = -1;
-    // Location of the uniform specifying a color for the primitive.
-    this.iColor = -1;
-    // Location of the uniform matrix representing the combined transformation.
-    this.iModelViewProjectionMatrix = -1;
-
-    this.iNormal = -1;
-    this.iNormalMatrix = -1;
-
-    this.iAmbientColor = -1;
-    this.iDiffuseColor = -1;
-    this.iSpecularColor = -1;
-
-    this.iShininess = -1;
-
-    this.iLightPosition = -1;
-    this.iLightVec = -1;
-
+    this.iNormalVertex = -1;
     this.iTextureCoords = -1;
-    this.iTextureU = -1;
-    this.iTextureAngle = -1;
-    this.iTexturePoint = -1;
 
-    this.Use = function () {
+    this.iColor = -1;
+
+    this.iModelViewProjectionMatrix = -1;
+    this.iWorldMatrix = -1;
+    this.iWorldInverseTranspose = -1;
+
+    this.iLightWorldPosition = -1;
+    this.iLightDirection = -1;
+
+    this.iViewWorldPosition = -1;
+
+    this.iTexture = -1;
+
+    this.iScalePointLocation = -1;
+    this.iScaleValue = -1;
+
+    this.iDrawPoint = -1;
+
+    this.iScalePointWorldLocation = -1;
+   
+    this.Use = function() {
         gl.useProgram(this.prog);
-    };
+    }
 }
 
-
-/* Draws a colored cube, along with a set of coordinate axes.
- * (Note that the use of the above drawPrimitive function is not an efficient
- * way to draw with WebGL.  Here, the geometry is so simple that it doesn't matter.)
- */
-function draw() {
-    gl.clearColor(0, 0, 0, 1);
+function draw() { 
+    gl.clearColor(0,0,0,1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+    gl.enable(gl.CULL_FACE);
+
+    // Enable the depth buffer
+    gl.enable(gl.DEPTH_TEST);
+    
     /* Set the values of the projection transformation */
-    let projection = m4.perspective(Math.PI / 10, 1, 8, 1000);
+    let projection = m4.perspective(Math.PI/10, 1, 8, 18);
 
     /* Get the view matrix from the SimpleRotator object.*/
     let modelView = spaceball.getViewMatrix();
 
-    let rotateToPointZero = m4.axisRotation([0.707, 0.707, 0], 0.7);
-    let translateToPointZero = m4.translation(0, 0, -10);
+    let WorldMatrix = m4.translation(0, 0, -10);
 
-    let matAccum0 = m4.multiply(rotateToPointZero, modelView);
-    let matAccum1 = m4.multiply(translateToPointZero, matAccum0);
-    const modelViewInverse = m4.inverse(matAccum1, new Float32Array(16));
-    const normalMatrix = m4.transpose(modelViewInverse, new Float32Array(16));
+    let matAccum1 = m4.multiply(WorldMatrix, modelView );
+    let modelViewProjection = m4.multiply(projection, matAccum1 );
 
-    /* Multiply the projection matrix times the modelview matrix to give the
-       combined transformation matrix, and send that to the shader program. */
-    let modelViewProjection = m4.multiply(projection, matAccum1);
+    var worldInverseMatrix = m4.inverse(matAccum1);
+    var worldInverseTransposeMatrix = m4.transpose(worldInverseMatrix);
 
-    gl.uniformMatrix4fv(
-        shProgram.iModelViewProjectionMatrix,
-        false,
-        modelViewProjection
-    );
-    gl.uniformMatrix4fv(shProgram.iNormalMatrix, false, normalMatrix);
+    gl.uniform3fv(shProgram.iViewWorldPosition, [0, 0, 0]); 
 
-    gl.uniform3fv(shProgram.iLightPosition, lightCoordinates());
-    gl.uniform3fv(shProgram.iLightDirection, [1, 0, 0]);
-    gl.uniform3fv(shProgram.iLightVec, new Float32Array(3));
-    gl.uniform1f(shProgram.iShininess, 1.0);
+    gl.uniform3fv(shProgram.iLightWorldPosition, CalcParabola());
+    gl.uniform3fv(shProgram.iLightDirection, [0, -1, 0]);
 
-    gl.uniform3fv(shProgram.iAmbientColor, [0.5, 0, 0.4]);
-    gl.uniform3fv(shProgram.iDiffuseColor, [1.3, 1.0, 0.0]);
-    gl.uniform3fv(shProgram.iSpecularColor, [1.5, 1.0, 1.0]);
-    /* Draw the six faces of a cube, with different colors. */
-    gl.uniform4fv(shProgram.iColor, [1, 1, 0, 1]);
+    gl.uniformMatrix4fv(shProgram.iWorldInverseTranspose, false, worldInverseTransposeMatrix);
+    gl.uniformMatrix4fv(shProgram.iModelViewProjectionMatrix, false, modelViewProjection );
+    gl.uniformMatrix4fv(shProgram.iWorldMatrix, false, matAccum1 );
+    
+    gl.uniform4fv(shProgram.iColor, [0.5,0.5,0.5,1] );
 
-    const angle = document.getElementById("rAngle").value;
-    gl.uniform1f(shProgram.iTextureAngle, deg2rad(+angle));
+    gl.uniform2fv(shProgram.iScalePointLocation, [ScalePointLocationU / 360.0, ScalePointLocationV / 90.0] );
+    gl.uniform1f(shProgram.iScaleValue, ControllerScaleValue);
 
-    const u = deg2rad(texturePoint.x);
-    const v = deg2rad(texturePoint.y);
-
-    gl.uniform2fv(shProgram.iTexturePoint, [
-        a * (b - Math.cos(u)) * Math.sin(u) * Math.cos(v),
-        a * (b - Math.cos(u)) * Math.sin(u) * Math.sin(v),
-    ]);
-
-    gl.activeTexture(gl.TEXTURE0);
-    gl.uniform1i(shProgram.iTextureU, 0);
-
+    gl.uniform1i(shProgram.iTexture, 0);
+    
     surface.Draw();
 }
 
-const step = (max, splines = 20) => {
-    return max / (splines - 1);
-};
+function CreateSurfaceData()
+{
+    let step = 5.0;
+    let uend = 720 + step;
+    let vend = 720 + step;
+    let DeltaU = 0.0001;
+    let DeltaV = 0.0001;
 
-function CreateSurfaceData() {
     let vertexList = [];
-    let textureList = [];
-    let splines = 20;
-    let maxU = Math.PI;
-    let maxV = 2 * Math.PI;
-    let stepU = step(maxU, splines);
-    let stepV = step(maxV, splines);
-    let getU = (u) => {
-        return u / maxU;
-    };
-    let getV = (v) => {
-        return v / maxV;
-    };
-    const POINTS = 100;
-    const a = 0.5;
-    const b = 0.5;
-    const c = 0.5;
-    const d = 1;
-    for (let u = 0; u <= POINTS; u += stepU) {
-        const U = u * 2 * Math.PI / POINTS;
-        for (let v = 0; v < POINTS; v += stepV) {
-            const V = v * 2 * Math.PI / POINTS;
-            const x = (a + c * Math.pow(Math.cos(V), 3) * Math.cos(Math.PI) + d * Math.pow(Math.sin(V), 3) * Math.sin(Math.PI)) * Math.cos(U);
-            const y = (a + c * Math.pow(Math.cos(V), 3) * Math.cos(Math.PI) + d * Math.pow(Math.sin(V), 3) * Math.sin(Math.PI)) * Math.sin(U);
-            const z = b * U - c * Math.pow(Math.cos(V), 3) * Math.sin(Math.PI) + d * Math.pow(Math.sin(V), 3) * Math.cos(Math.PI);
-            vertexList.push(x, y, z);
-            textureList.push(getU(u), getV(v));
-            const x1 = (a + c * Math.pow(Math.cos(V + stepV), 3) * Math.cos(Math.PI) + d * Math.pow(Math.sin(V + stepV), 3) * Math.sin(Math.PI)) * Math.cos(U + stepU);
-            const y1 = (a + c * Math.pow(Math.cos(V + stepV), 3) * Math.cos(Math.PI) + d * Math.pow(Math.sin(V + stepV), 3) * Math.sin(Math.PI)) * Math.sin(U + stepU);
-            const z1 = b * U - c * Math.pow(Math.cos(V + stepV), 3) * Math.sin(Math.PI) + d * Math.pow(Math.sin(V + stepV), 3) * Math.cos(Math.PI);
-            vertexList.push(x1, y1, z1)
-            textureList.push(getU(u + stepU), getV(v + stepV));
+    let normalsList = [];
+    let textCoords = [];
+
+    for (let u = 0; u < uend; u += step) {
+        for (let v = 0; v < vend; v += step) {
+            let unext = u + step;
+
+            let x = CalcX(u, v);
+            let y = CalcY(u, v);
+            let z = CalcZ(u, v);
+            vertexList.push( x, y, z );
+
+            x = CalcX(unext, v);
+            y = CalcY(unext, v);
+            z = CalcZ(unext, v);
+            vertexList.push( x, y, z );
+
+            let DerivativeU = CalcDerivativeU(u, v, DeltaU);
+            let DerivativeV = CalcDerivativeV(u, v, DeltaV);
+
+            let result = m4.cross(DerivativeV, DerivativeU);
+            normalsList.push(result[0], result[1], result[2]);
+
+            DerivativeU = CalcDerivativeU(unext, v, DeltaU);
+            DerivativeV = CalcDerivativeV(unext, v, DeltaV);
+
+            result = m4.cross(DerivativeV, DerivativeU);
+            normalsList.push(result[0], result[1], result[2]);
+
+            textCoords.push(u / uend, v / vend);
+            textCoords.push(unext / uend, v / vend);
         }
     }
-    return {vertexList, textureList};
+
+    return [vertexList, normalsList, textCoords];
 }
 
+function CalcX(u, v)
+{
+    let uRad =  deg2rad(u);
+    let vRad = deg2rad(v);
+
+    return (a + c * Math.pow(Math.cos(vRad), 3) * Math.cos(phi) + c * Math.pow(Math.sin(vRad), 3) * Math.sin(phi)) * Math.cos(uRad);
+}
+
+function CalcY(u, v)
+{
+    let uRad =  deg2rad(u);
+    let vRad = deg2rad(v);
+
+    return (a + c * Math.pow(Math.cos(vRad), 3) * Math.cos(phi) + c * Math.pow(Math.sin(vRad), 3) * Math.sin(phi)) * Math.sin(uRad);
+}
+
+function CalcZ(u, v)
+{
+    let uRad =  deg2rad(u);
+    let vRad = deg2rad(v);
+
+    return b * uRad - c * Math.pow(Math.cos(vRad), 3) * Math.sin(phi) + c * Math.pow(Math.sin(vRad), 3) * Math.cos(phi);
+}
+
+function CalcDerivativeU(u, v, uDelta)
+{
+    let x = CalcX(u, v);
+    let y = CalcY(u, v);
+    let z = CalcZ(u, v);
+
+    let Dx = CalcX(u + uDelta, v);
+    let Dy = CalcY(u + uDelta, v);
+    let Dz = CalcZ(u + uDelta, v);
+
+    let Dxdu = (Dx - x) / deg2rad(uDelta);
+    let Dydu = (Dy - y) / deg2rad(uDelta);
+    let Dzdu = (Dz - z) / deg2rad(uDelta);
+
+    return [Dxdu, Dydu, Dzdu];
+}
+
+function CalcDerivativeV(u, v, vDelta)
+{
+    let x = CalcX(u, v);
+    let y = CalcY(u, v);
+    let z = CalcZ(u, v);
+
+    let Dx = CalcX(u, v + vDelta);
+    let Dy = CalcY(u, v + vDelta);
+    let Dz = CalcZ(u, v + vDelta);
+
+    let Dxdv = (Dx - x) / deg2rad(vDelta);
+    let Dydv = (Dy - y) / deg2rad(vDelta);
+    let Dzdv = (Dz - z) / deg2rad(vDelta);
+
+    return [Dxdv, Dydv, Dzdv];
+}
 
 /* Initialize the WebGL context. Called from init() */
 function initGL() {
-    let prog = createProgram(gl, vertexShaderSource, fragmentShaderSource);
+    let prog = createProgram( gl, vertexShaderSource, fragmentShaderSource );
 
-    shProgram = new ShaderProgram("Basic", prog);
+    shProgram = new ShaderProgram('Basic', prog);
     shProgram.Use();
 
-    shProgram.iAttribVertex = gl.getAttribLocation(prog, "vertex");
-    shProgram.iModelViewProjectionMatrix = gl.getUniformLocation(
-        prog,
-        "ModelViewProjectionMatrix"
-    );
-    shProgram.iColor = gl.getUniformLocation(prog, "color");
+    shProgram.iAttribVertex              = gl.getAttribLocation(prog, "vertex");
+    shProgram.iNormalVertex              = gl.getAttribLocation(prog, "normal");
+    shProgram.iTextureCoords             = gl.getAttribLocation(prog, "texcoord");
+    
+    shProgram.iColor                     = gl.getUniformLocation(prog, "color");
 
-    shProgram.iNormal = gl.getAttribLocation(prog, "normal");
-    shProgram.iNormalMatrix = gl.getUniformLocation(prog, "normalMatrix");
+    shProgram.iModelViewProjectionMatrix = gl.getUniformLocation(prog, "ModelViewProjectionMatrix");
+    shProgram.iWorldInverseTranspose     = gl.getUniformLocation(prog, "WorldInverseTranspose");
+    shProgram.iWorldMatrix               = gl.getUniformLocation(prog, "WorldMatrix");
 
-    shProgram.iAmbientColor = gl.getUniformLocation(prog, "ambientColor");
-    shProgram.iDiffuseColor = gl.getUniformLocation(prog, "diffuseColor");
-    shProgram.iSpecularColor = gl.getUniformLocation(prog, "specularColor");
+    shProgram.iLightWorldPosition        = gl.getUniformLocation(prog, "LightWorldPosition");
+    shProgram.iLightDirection            = gl.getUniformLocation(prog, "LightDirection");
 
-    shProgram.iShininess = gl.getUniformLocation(prog, "shininess");
+    shProgram.iViewWorldPosition         = gl.getUniformLocation(prog, "ViewWorldPosition");
+    
+    shProgram.iTexture                   = gl.getUniformLocation(prog, "u_texture");
 
-    shProgram.iLightPosition = gl.getUniformLocation(prog, "lightPosition");
-    shProgram.iLightVec = gl.getUniformLocation(prog, "lightVec");
+    shProgram.iScalePointLocation        = gl.getUniformLocation(prog, "ScalePointLocation");
+    shProgram.iScaleValue                = gl.getUniformLocation(prog, "ScaleValue");
+    
+    shProgram.iDrawPoint                 = gl.getUniformLocation(prog, "bDrawpoint");
 
-    shProgram.iTextureCoords = gl.getAttribLocation(prog, "textureCoords");
-    shProgram.iTextureU = gl.getUniformLocation(prog, "textureU");
-    shProgram.iTextureAngle = gl.getUniformLocation(prog, "textureAngle");
-    shProgram.iTexturePoint = gl.getUniformLocation(prog, "texturePoint");
+    shProgram.iScalePointWorldLocation   = gl.getUniformLocation(prog, "ScalePointWorldLocation");
 
-    surface = new Model("Surface");
-    const {vertexList, textureList} = CreateSurfaceData();
-    surface.BufferData(vertexList, textureList);
+    surface = new Model('Surface');
+    let SurfaceData = CreateSurfaceData();
 
-    loadTexture();
 
-    gl.enable(gl.DEPTH_TEST);
+    surface.BufferData(SurfaceData[0], SurfaceData[1], SurfaceData[2]);
+
+   // gl.enable(gl.DEPTH_TEST);
 }
 
 
@@ -239,135 +308,195 @@ function initGL() {
  * source code for the vertex shader and for the fragment shader.
  */
 function createProgram(gl, vShader, fShader) {
-    let vsh = gl.createShader(gl.VERTEX_SHADER);
-    gl.shaderSource(vsh, vShader);
+    let vsh = gl.createShader( gl.VERTEX_SHADER );
+    gl.shaderSource(vsh,vShader);
     gl.compileShader(vsh);
-    if (!gl.getShaderParameter(vsh, gl.COMPILE_STATUS)) {
+    if ( ! gl.getShaderParameter(vsh, gl.COMPILE_STATUS) ) {
         throw new Error("Error in vertex shader:  " + gl.getShaderInfoLog(vsh));
-    }
-    let fsh = gl.createShader(gl.FRAGMENT_SHADER);
+     }
+    let fsh = gl.createShader( gl.FRAGMENT_SHADER );
     gl.shaderSource(fsh, fShader);
     gl.compileShader(fsh);
-    if (!gl.getShaderParameter(fsh, gl.COMPILE_STATUS)) {
-        throw new Error("Error in fragment shader:  " + gl.getShaderInfoLog(fsh));
+    if ( ! gl.getShaderParameter(fsh, gl.COMPILE_STATUS) ) {
+       throw new Error("Error in fragment shader:  " + gl.getShaderInfoLog(fsh));
     }
     let prog = gl.createProgram();
-    gl.attachShader(prog, vsh);
+    gl.attachShader(prog,vsh);
     gl.attachShader(prog, fsh);
     gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
-        throw new Error("Link error in program:  " + gl.getProgramInfoLog(prog));
+    if ( ! gl.getProgramParameter( prog, gl.LINK_STATUS) ) {
+       throw new Error("Link error in program:  " + gl.getProgramInfoLog(prog));
     }
     return prog;
 }
-
 
 /**
  * initialization function that will be called when the page has loaded
  */
 function init() {
+    // Canvas
     let canvas;
     try {
         canvas = document.getElementById("webglcanvas");
         gl = canvas.getContext("webgl");
-        if (!gl) {
+        if ( ! gl ) {
             throw "Browser does not support WebGL";
         }
-    } catch (e) {
-        document.getElementById("canvas-holder").innerHTML = "<p>Sorry, could not get a WebGL graphics context.</p>";
+    }
+    catch (e) {
+        document.getElementById("canvas-holder").innerHTML =
+            "<p>Sorry, could not get a WebGL graphics context.</p>";
         return;
     }
+
+    // GL
     try {
         initGL();  // initialize the WebGL graphics context
-    } catch (e) {
-        document.getElementById("canvas-holder").innerHTML = "<p>Sorry, could not initialize the WebGL graphics context: " + e + "</p>";
+    }
+    catch (e) {
+        document.getElementById("canvas-holder").innerHTML =
+            "<p>Sorry, could not initialize the WebGL graphics context: " + e + "</p>";
         return;
     }
 
     spaceball = new TrackballRotator(canvas, draw, 0);
 
-    draw();
+    LoadTexture();
 }
 
-window.addEventListener("keydown", function (event) {
-    switch (event.code) {
-        case "ArrowLeft":
-            left();
+window.addEventListener("keydown", function (event) {  
+    switch (event.key) {
+      case "ArrowLeft":
+        ProcessArrowLeftDown();
+        break;
+      case "ArrowRight":
+        ProcessArrowRightDown();
+        break;
+        case "W":
+            ProcessWDown();
             break;
-        case "ArrowRight":
-            right();
+        case "w":
+            ProcessWDown();
             break;
-        case "KeyW":
-            pressW();
+        case "S":
+            ProcessSDown();
             break;
-        case "KeyS":
-            pressS();
+        case "s":
+            ProcessSDown();
             break;
-        case "KeyD":
-            pressD();
+        case "A":
+            ProcessADown();
             break;
-        case "KeyA":
-            pressA();
+        case "a":
+            ProcessADown();
             break;
-        default:
-            return;
+        case "D":
+            ProcessDDown();
+            break;
+        case "d":
+            ProcessDDown();
+            break;
+        case "+":
+            ProcessPlusDown();
+            break;
+        case "-":
+            ProcessSubtractDown();
+            break;
+      default:
+            break; 
     }
+
+    draw();
 });
 
-const left = () => {
-    handlePosition -= 0.07;
-    reDraw();
-};
+function ProcessArrowLeftDown()
+{
+    InputCounter -= 0.05;
+}
 
-const right = () => {
-    handlePosition += 0.07;
-    reDraw();
-};
+function ProcessArrowRightDown()
+{
+    InputCounter += 0.05;
+}
 
-const pressW = () => {
-    texturePoint.y += 0.5;
-    reDraw();
-};
+function CalcParabola()
+{
+    let TParam = Math.sin(InputCounter) * 1.2;
+    return [TParam, 6, -10 + (TParam * TParam)];
+}
 
-const pressS = () => {
-    texturePoint.y -= 0.5;
-    reDraw();
-};
+function LoadTexture()
+{
+    var texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
 
-const pressA = () => {
-    texturePoint.x -= 0.5;
-    reDraw();
-};
-
-const pressD = () => {
-    texturePoint.x += 0.5;
-    reDraw();
-};
-
-const lightCoordinates = () => {
-    let coord = Math.sin(handlePosition) * 1.2;
-    return [coord, -2, coord * coord];
-};
-
-
-const reDraw = () => {
-    const {vertexList, textureList} = CreateSurfaceData();
-    surface.BufferData(vertexList, textureList);
-    draw();
-};
-
-const loadTexture = () => {
-    const image = new Image();
-    image.crossOrigin = "anonymous";
-    image.src =
-        "https://www.the3rdsequence.com/texturedb/download/259/texture/jpg/1024/burning+hot+lava-1024x1024.jpg";
-
-    image.addEventListener("load", () => {
-        const texture = gl.createTexture();
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+ 
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+              new Uint8Array([0, 0, 255, 255]));
+ 
+    var image = new Image();
+    image.crossOrigin = "anonymous"
+    image.src = "https://www.iconexperience.com/_img/v_collection_png/256x256/shadow/airplane.png";
+    image.addEventListener('load', function() {
         gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, image);
+
+        console.log("Texture is loaded!");
+
         draw();
     });
-};
+}
+
+function ProcessWDown()
+{
+    ScalePointLocationV -= 5.0;
+    ScalePointLocationV = clamp(ScalePointLocationV, 0.0, 90);
+}
+
+function ProcessSDown()
+{
+    ScalePointLocationV += 5.0;
+    ScalePointLocationV = clamp(ScalePointLocationV, 0.0, 90);
+}
+
+function ProcessADown()
+{
+    ScalePointLocationU -= 5.0;
+    ScalePointLocationU = clamp(ScalePointLocationU, 0.0, 360);
+}
+
+function ProcessDDown()
+{
+    ScalePointLocationU += 5.0;
+    ScalePointLocationU = clamp(ScalePointLocationU, 0.0, 360);
+}
+
+function ProcessPlusDown()
+{
+    ControllerScaleValue += 0.05;
+    ControllerScaleValue = clamp(ControllerScaleValue, 0.5, 2.0);
+}
+
+function ProcessSubtractDown()
+{
+    ControllerScaleValue -= 0.05;
+    ControllerScaleValue = clamp(ControllerScaleValue, 0.5, 2.0);
+}
+
+function clamp(value, min, max)
+{
+    if(value < min)
+    {
+        value = min
+    }
+    else if(value > max)
+    {
+        value = max;
+    }
+
+    return value;
+}

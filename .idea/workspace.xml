@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="283f4785-a107-46b5-ad06-01c1f5ab1ac7" name="Changes" comment="add gif and pdf files">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/New Microsoft Word Document.docx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/screen_cgw.mp4" beforeDir="false" afterPath="$PROJECT_DIR$/screen_cgw.mp4" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shader.gpu" beforeDir="false" afterPath="$PROJECT_DIR$/shader.gpu" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="PA2" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="SET_USER_NAME_GLOBALLY" value="false" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2KiJEkbKIZ6cpr0xpVVJ1pZgQvZ" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/max20/Desktop/swwq/graphic&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\max20\Desktop\swwq\graphic" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="283f4785-a107-46b5-ad06-01c1f5ab1ac7" name="Changes" comment="" />
+      <created>1674451360860</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1674451360860</updated>
+      <workItem from="1674451362140" duration="560000" />
+      <workItem from="1674451947682" duration="1301000" />
+      <workItem from="1674453275936" duration="5988000" />
+      <workItem from="1674479573314" duration="65000" />
+      <workItem from="1674479650754" duration="7056000" />
+      <workItem from="1674565506565" duration="7248000" />
+      <workItem from="1675291513241" duration="1951000" />
+      <workItem from="1675334671695" duration="2040000" />
+      <workItem from="1675413614038" duration="3742000" />
+      <workItem from="1675512702946" duration="771000" />
+    </task>
+    <task id="LOCAL-00001" summary="initial commit">
+      <created>1674456047240</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1674456047240</updated>
+    </task>
+    <task id="LOCAL-00002" summary="testing1">
+      <created>1674456617866</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1674456617866</updated>
+    </task>
+    <task id="LOCAL-00003" summary="add images">
+      <created>1674481852832</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1674481852832</updated>
+    </task>
+    <task id="LOCAL-00004" summary="implement gif creation">
+      <created>1674482527035</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1674482527035</updated>
+    </task>
+    <task id="LOCAL-00005" summary="fix CreateSurfaceData">
+      <created>1674483628004</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1674483628004</updated>
+    </task>
+    <task id="LOCAL-00006" summary="add gif">
+      <created>1674484846129</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1674484846129</updated>
+    </task>
+    <task id="LOCAL-00007" summary="CGW">
+      <created>1674485992129</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1674485992129</updated>
+    </task>
+    <task id="LOCAL-00008" summary="fix CGW">
+      <created>1674486444470</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1674486444470</updated>
+    </task>
+    <task id="LOCAL-00009" summary="fix CGW">
+      <created>1674486599936</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1674486599936</updated>
+    </task>
+    <task id="LOCAL-00010" summary="fix CGW 2">
+      <created>1674488630151</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1674488630151</updated>
+    </task>
+    <task id="LOCAL-00011" summary="fix CGW 2">
+      <created>1674488768318</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1674488768318</updated>
+    </task>
+    <task id="LOCAL-00012" summary="fix CGW 4">
+      <created>1674488975508</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1674488975508</updated>
+    </task>
+    <task id="LOCAL-00013" summary="refactor main.js">
+      <created>1674567445083</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1674567445083</updated>
+    </task>
+    <task id="LOCAL-00014" summary="change background img for texture">
+      <created>1674567716263</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1674567716263</updated>
+    </task>
+    <task id="LOCAL-00015" summary="change background img for texture [2]">
+      <created>1674567914526</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1674567914526</updated>
+    </task>
+    <task id="LOCAL-00016" summary="change background img for texture [3]">
+      <created>1674568268800</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1674568268800</updated>
+    </task>
+    <task id="LOCAL-00017" summary="final update">
+      <created>1674571395145</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1674571395145</updated>
+    </task>
+    <task id="LOCAL-00018" summary="add gif and pdf files">
+      <created>1674573265286</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1674573265286</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="initial commit" />
+    <MESSAGE value="testing1" />
+    <MESSAGE value="add images" />
+    <MESSAGE value="implement gif creation" />
+    <MESSAGE value="fix CreateSurfaceData" />
+    <MESSAGE value="add gif" />
+    <MESSAGE value="CGW" />
+    <MESSAGE value="fix CGW" />
+    <MESSAGE value="fix CGW 2" />
+    <MESSAGE value="fix CGW 4" />
+    <MESSAGE value="fix CGW 5" />
+    <MESSAGE value="refactor main.js" />
+    <MESSAGE value="change background img for texture" />
+    <MESSAGE value="change background img for texture [2]" />
+    <MESSAGE value="change background img for texture [3]" />
+    <MESSAGE value="final update" />
+    <MESSAGE value="add gif and pdf files" />
+    <option name="LAST_COMMIT_MESSAGE" value="add gif and pdf files" />
+  </component>
+</project>
